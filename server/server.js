@@ -29,7 +29,7 @@ io.on('connection', (socket) => { //an event listener (listening for a client to
 
     io.to(params.room).emit('updateUserList', users.getUserList(params.room));
     socket.emit('newMessage', generateMessage('Admin', `Welcome ${params.name}`));
-    socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `${params.name} has joined`)); //alerting other users that someone new has joined
+    //socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `${params.name} has joined`)); //alerting other users that someone new has joined
     callback();
   });
 
@@ -54,7 +54,7 @@ io.on('connection', (socket) => { //an event listener (listening for a client to
 
     if(user) {
       io.to(user.room).emit('updateUserList', users.getUserList(user.room)); //getting a new list once the user leaves
-      io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left.`)); //telling the people that user has left
+      //io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left.`)); //telling the people that user has left
     }
   });
 });
