@@ -4,6 +4,7 @@ const express = require('express');
 const socketIO = require('socket.io');
 const publicPath = path.join(__dirname, '../public');
 const port = process.env.PORT || 3000; //process.env.port is for heroku(3000 is for local)
+const {generateMessage, generateLocationMessage} = require('./utils/message');
 
 
 var app = express();
@@ -12,6 +13,21 @@ var io = socketIO(server);
 
 io.on('connection', (socket) => { //an event listener (listening for a client to connect)
   console.log('New user connected');
+
+  socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
+
+  socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
+
+  socket.on('createMessage', (message, callback) => { //socket sends to one connection
+    console.log('createMessage', message);
+    io.emit('newMessage', generateMessage(message.from, message.text)); //io sends to all connections
+    callback();
+
+  });
+
+  socket.on('createLocationMessage', (coords) => {
+    io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude)); //receiving the coordinates from index.js
+  });
 
   socket.on('disconnect', () => {
     console.log('This user has disconnected');
