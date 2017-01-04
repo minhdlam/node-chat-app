@@ -31,7 +31,7 @@ socket.on('disconnect', function() {
   console.log('Disconnected from server');
 });
 
-socket.on('updateUserList', function (users) {
+socket.on('updateUserList', function (users) { //updating the list on the sidebar
   var ol = jQuery('<ol></ol>');
   users.forEach(function (user) {
     ol.append(jQuery('<li></li>').text(user));
@@ -81,7 +81,6 @@ jQuery('#message-form').on('submit', function (e) { //attaching the submit form 
   var messageTextBox = jQuery('[name=message]');
 
   socket.emit('createMessage', {
-    from: 'User',
     text: messageTextBox.val() //getting the value in the text field
   }, function () {
     messageTextBox.val(''); //setting the text field to be empty once the message is sent

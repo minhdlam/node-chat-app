@@ -34,14 +34,19 @@ io.on('connection', (socket) => { //an event listener (listening for a client to
   });
 
   socket.on('createMessage', (message, callback) => { //socket sends to one connection
-    console.log('createMessage', message);
-    io.emit('newMessage', generateMessage(message.from, message.text)); //io sends to all connections
+    var user = users.getUser(socket.id);
+    if (user && isRealString(message.text)) { //only sending if there is a user and what they typed is a string
+      io.to(user.room).emit('newMessage', generateMessage(user.name, message.text)); //only sending the messages to people in this specific room
+    }
     callback();
-
   });
 
   socket.on('createLocationMessage', (coords) => {
-    io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude)); //receiving the coordinates from index.js
+    var user = users.getUser(socket.id);
+    if (user){
+      io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude)); //receiving the coordinates from index.js
+    }
+
   });
 
   socket.on('disconnect', () => {
