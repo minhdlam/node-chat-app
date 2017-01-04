@@ -9,21 +9,38 @@ socket.on('disconnect', function() {
 });
 
 socket.on('newMessage', function(message) { //setting up a custom event called newMessage
-  console.log('New Message', message);
-  var li = jQuery('<li></li>');
-  li.text(`${message.from}: ${message.text}`);
 
-  jQuery('#messages').append(li); //adding the messages to the odered list with id messages
+  var formattedTime = moment(message.createdAt).format('h:mm a');
+  var template = jQuery('#message-template').html();
+  var html = Mustache.render(template, {
+    text: message.text,
+    from: message.from,
+    createdAt: formattedTime
+  });
+
+  jQuery('#messages').append(html);
+  // var formattedTime = moment(message.createdAt).format('h:mm a');
+  // var li = jQuery('<li></li>');
+  // li.text(`${message.from} ${formattedTime}: ${message.text}`);
+  //
+  // jQuery('#messages').append(li); //adding the messages to the odered list with id messages
 });
 
 socket.on('newLocationMessage', function (message) {
-  var li = jQuery('<li></li>');
-  var a = jQuery('<a target="_blank">My Current Location</a>'); //_blank opens that new url in a new tab
-
-  li.text(`${message.from}: `);
-  a.attr('href', message.url);
-  li.append(a);
-  jQuery('#messages').append(li);
+  var formattedTime = moment(message.createdAt).format('h:mm a');
+  var template = jQuery('#location-message-template').html(); //getting the inner html back
+  var html = Mustache.render(template, { //storing the return value
+    from: message.from,
+    url: message.url,
+    createdAt: formattedTime
+  });
+  // var li = jQuery('<li></li>');
+  // var a = jQuery('<a target="_blank">My Current Location</a>'); //_blank opens that new url in a new tab
+  //
+  // li.text(`${message.from} ${formattedTime}:`);
+  // a.attr('href', message.url);
+  // li.append(a);
+  jQuery('#messages').append(html);
 });
 jQuery('#message-form').on('submit', function (e) { //attaching the submit form to this function
   e.preventDefault();
