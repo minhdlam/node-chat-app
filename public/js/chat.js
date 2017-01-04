@@ -1,4 +1,20 @@
 var socket = io(); //creating a connection
+
+function scrollToBottom() {
+  // Selectors
+  var messages = jQuery('#messages');
+  var newMessage = messages.children('li:last-child');
+  // Heights
+  var clientHeight = messages.prop('clientHeight');
+  var scrollTop = messages.prop('scrollTop');
+  var scrollHeight = messages.prop('scrollHeight');
+  var newMessageHeight = newMessage.innerHeight();
+  var lastMessageHeight = newMessage.prev().innerHeight();
+
+  if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
+    messages.scrollTop(scrollHeight); //scrollTop is a jQuery function that autoscrolls
+  }
+}
 socket.on('connect', function() { //an event listener for the client
   console.log('Connected to server');
 
@@ -10,16 +26,17 @@ socket.on('disconnect', function() {
 
 socket.on('newMessage', function(message) { //setting up a custom event called newMessage
 
-  var formattedTime = moment(message.createdAt).format('h:mm a');
-  var template = jQuery('#message-template').html();
-  var html = Mustache.render(template, {
+  var formattedTime = moment(message.createdAt).format('h:mm a'); //using moment to format the time
+  var template = jQuery('#message-template').html(); //getting the inner html
+  var html = Mustache.render(template, { //using mustache to add objects to the template
     text: message.text,
     from: message.from,
     createdAt: formattedTime
   });
 
   jQuery('#messages').append(html);
-  // var formattedTime = moment(message.createdAt).format('h:mm a');
+  scrollToBottom();
+  // var formattedTime = moment(message.createdAt).format('h:mm a'); //these four lines are the old way of doing the same thing above but without mustache
   // var li = jQuery('<li></li>');
   // li.text(`${message.from} ${formattedTime}: ${message.text}`);
   //
@@ -41,6 +58,7 @@ socket.on('newLocationMessage', function (message) {
   // a.attr('href', message.url);
   // li.append(a);
   jQuery('#messages').append(html);
+  scrollToBottom();
 });
 jQuery('#message-form').on('submit', function (e) { //attaching the submit form to this function
   e.preventDefault();
